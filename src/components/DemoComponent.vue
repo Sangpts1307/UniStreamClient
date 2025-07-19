@@ -22,9 +22,66 @@
                     <span v-for="_snt in listSNT">{{ _snt }}, </span>
                 </p>
             </div>
+
+            <!-- BEGIN CHANGE COLOR BOX BY STYLE BINDING -->
+            <div class="col-md-12 d-flex">
+                <!-- Style binding -->
+                <div class="select-color-section" v-for="color in arrColor" :style="{background: color}" v-on:click="fillColor(color)"></div>
+            </div>  
+            <!-- Truyền màu sau khi click vào biến color trong data default, lúc hiển thị nó sẽ chuyển theo -->
+            <div class="col-md-12" id="preview_color" :style="{background: this.color}"></div>
+            <!-- END CHANGE COLOR BOX -->
+            
+            <!-- BEGIN CLASS BINDING -->
+            <div class="col-md-12">
+                <button v-on:click="clickMe()">Click me and active</button>
+                <!-- Class binding -->
+                <p :class="{'text-danger': this.clickStatus}">Đề thi vẽ còn hay hơn đề văn</p>
+                <button v-on:click="changeActive()">Click me!</button>
+                <button :disabled="activeStatus">Click status</button>
+            </div>
+            <!-- END CLASS BINDING -->
+
+            <div class="col-md-12" id="the_matrix_one">
+                <div class="nm" style="display: flex;">
+                    <input v-model="n" type="number">
+                    X
+                    <input v-model="m" type="number">
+                </div>
+                <hr>
+                <div class="matrix" style="display: flex;">
+                    <div class="matrix1">
+                        {{ i }}
+                        <span v-for="i in n" :key="i">
+                            <input v-for="j in m" v-model="this.matrix1[i-1][j-1]" type="number">
+                            <br>
+                        </span>
+                    </div>
+                    <div class="clear-fix" style="width: 50px;"></div>
+                    <div class="matrix2">
+                        <span v-for="i in n" :key="i">
+                            <input v-for="j in m" v-model="this.matrix2[i-1][j-1]" type="number">
+                            <br>
+                        </span>
+                    </div>
+                    <div class="clear-fix" style="width: 50px;"></div>
+                    <div id="method">
+                        <button :disabled="n <= 0 || m <= 0" v-on:click="add()">+</button>
+                        <button :disabled="n <= 0 || m <= 0" v-on:click="multiple()">x</button>
+                    </div>
+                    <div class="clear-fix" style="width: 50px;"></div>
+                    <div id="matrix3">
+                        <span v-for="i in n" :key="i">
+                            <input v-for="j in m" v-model="this.matrix3[i-1][j-1]" type="number">
+                            <br>
+                        </span>
+                    </div>
+                    <p v-if="n <= 0" style="color: red;">N và M phải lớn hơn 0</p>
+                </div>
+            </div>
         </div>
     </div>
-</template>  
+</template>
 
 <!-- Define JS code -->
 <script>
@@ -52,7 +109,18 @@ export default {
             count2: 0,
             a: 0,
             checkSNT: false,
-            listSNT: []
+            listSNT: [],
+            arrColor: [
+                "blue", "green", "yellow", "red", "gray"
+            ],
+            color: "",
+            clickStatus: false,
+            activeStatus: false,
+            n: 1,
+            m: 1,
+            matrix1: [], // Default 0
+            matrix2: [], // Default 0
+            matrix3: [], // Default 0
         }
     },
     created() {
@@ -62,11 +130,17 @@ export default {
         console.log('Init created component and call to function get data from api server.');
         this.msg = "Click vào button dưới để tăng giá trị lên 1 đơn vị!"
         // Co the goi toi cac ham khac (trong methods)
+        this.initMatrix();
     },
     mounted() {
         /***********************************************************************************************************
          ******************** Once created, the interface is displayed and calls mounted. **************************
             **********************************************************************************************************/
+        // Code JS chay o trong nay hoac dung cac thu vien khac nhu jQuery o day
+        // jQuery code
+        $(document).ready(function () {
+            // alert("3.14");
+        });
     },
     watch: {
         /***********************************************************************************************************
@@ -108,8 +182,13 @@ export default {
                 }
             }
             console.log(this.listSNT);
-            
-        }
+        },
+        n() {
+            this.initMatrix();
+        },
+        m() {
+            this.initMatrix();
+        },
     },
     computed: {
         appendMsg() {
@@ -146,6 +225,79 @@ export default {
             this.count++;
         },
 
+        /**
+         * Method fill color to section preview
+         * 
+         * @param color 
+         */
+        fillColor(color) {
+            this.color = color;
+        },
+
+        /**
+         * Method handle click button and change stt
+         */
+        clickMe() {
+            if (this.clickStatus == true) {
+                this.clickStatus = false;
+            } else {
+                this.clickStatus = true;
+            }
+        },
+
+        /**
+         * Method handle click button and change active
+         */
+        changeActive() {
+            if (this.activeStatus == true) {
+                this.activeStatus = false;
+            } else {
+                this.activeStatus = true;
+            }
+        },
+
+        /**
+         * Method init matrix
+         */
+        initMatrix() {
+            // Init matrix
+            for (let i = 0; i < this.n; i++) {
+                this.matrix1[i] = [];
+                this.matrix2[i] = [];
+                this.matrix3[i] = [];
+                for (let j = 0; j < this.m; j++) {
+                    this.matrix1[i][j] = 0;
+                    this.matrix2[i][j] = 0;
+                    this.matrix3[i][j] = 0;
+                }
+            }
+        },
+        
+        /**
+         * Function add matrix
+         */
+        add() {
+            for (let i = 0; i < this.n; i++) {
+                for (let j = 0; j < this.m; j++) {
+                    this.matrix3[i][j] = this.matrix1[i][j] + this.matrix2[i][j];
+                }
+            }
+        },
+
+        /**
+         * Function multiply matrix
+         */
+        multiple() {
+            for (let i = 0; i < this.n; i++) {
+                for (let j = 0; j < this.m; j++) {
+                    let tmp = 0;
+                    for (let k = 0; k < this.m; k++) {
+                        tmp += this.matrix1[i][k] * this.matrix2[k][j];
+                    }
+                    this.matrix3[i][j] = tmp;
+                }
+            }
+        },
         /***********************************************************************************************************
          ******* Async and await functions for manipulating server-side data through internal API protocols ********
             **********************************************************************************************************/
@@ -175,4 +327,25 @@ export default {
 /**
 * Custom local style css
 */
+.select-color-section {
+    width: 100px;
+    height: 30px;
+    border: 1px solid black;
+    margin-right: 10px;
+}
+.d-flex {
+    display: flex;   
+}
+#preview_color {
+    margin-top: 15px;
+    height: 150px;
+    width: 540px;
+    border: 1px solid black;
+}
+.text-danger {
+    color: red !important;
+}
+#the_matrix_one input {
+    width: 50px;
+}
 </style>

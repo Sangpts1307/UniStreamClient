@@ -1,17 +1,15 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import DemoComponent from './components/DemoComponent.vue'
-import ChildComponent from './components/ChildComponent.vue'
-import FormComponent from './components/FormComponent.vue'
-import DetailComponent from './components/DetailComponent.vue'
-</script>
-
 <template>
-  <div id="main">
-    <FormComponent @detail="handleDetailEmployee"/>
-    <DetailComponent v-if="employeeNumberCurrent" :currentEmployee="employeeNumberCurrent"/>
-  </div>
+    <div id="detail">
+        <h3>Mã nhân viên: <span class="font-bold">{{ currentEmployee.employee_number }}</span></h3>
+        <h3>Họ và tên: <span class="font-bold">{{ currentEmployee.full_name }}</span></h3>
+        <input type="number" v-model="qty" placeholder="1">
+        <br>
+        <select name="" id="" v-model="type">
+            <option v-for="type in listType" :value="type">{{ type }}</option>
+        </select>
+        <br>
+        <button v-on:click="addQTY()">Thêm</button>
+    </div>
 </template>
 
 <script>
@@ -20,7 +18,6 @@ import DetailComponent from './components/DetailComponent.vue'
  */
 // import Vue from 'vue'
 import axios from 'axios'
-import ChildComponent from './components/ChildComponent.vue'
 // import component1 from 'component1'
 // import component2 from 'component2'
 
@@ -28,14 +25,16 @@ export default {
     /***********************************************************************************************************
      ******************************* Pass data to child component **********************************************
         **********************************************************************************************************/
-    // prop: [variable1, variable2],
+    props: ["currentEmployee"],
     // components: {component1, component2},
     data() {
         /***********************************************************************************************************
          ******************************* Initialize global variables ***********************************************
             **********************************************************************************************************/
         return {
-            employeeNumberCurrent: null
+            qty: 1,
+            type: "terebi",
+            listType: ["keitai denwa", "terebi", "kompuuta", "Laptopu"],
         }
     },
     created() {
@@ -79,9 +78,6 @@ export default {
             console.log(pageNum);
             return false;
         },
-        handleDetailEmployee(employee) {
-            this.employeeNumberCurrent = employee;
-        },
 
         
         /***********************************************************************************************************
@@ -110,11 +106,11 @@ export default {
 </script>
 
 <style scoped>
-#main {
-  width: 700px;
-  height: 700px;
-  border: 1px solid gray;
-  margin: 0 auto;
-  display: flex;
+#detail {
+    width: 300px;
+    height: 300px;
+}
+.font-bold {
+    font-weight: bold;
 }
 </style>

@@ -1,26 +1,33 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import DemoComponent from './components/DemoComponent.vue'
-import ChildComponent from './components/ChildComponent.vue'
-import FormComponent from './components/FormComponent.vue'
-import DetailComponent from './components/DetailComponent.vue'
-</script>
-
 <template>
-  <div id="main">
-    <FormComponent @detail="handleDetailEmployee"/>
-    <DetailComponent v-if="employeeNumberCurrent" :currentEmployee="employeeNumberCurrent"/>
-  </div>
+    <div id="form-add-new">
+        <input type="text" v-model="employeeNumber" placeholder="Mã nhân viên">
+        <input type="text" v-model="fullName" placeholder="Họ và tên">
+        <button v-on:click="add()">Thêm</button>
+        <div id="table" border="1">
+            <table>
+                <thead>
+                    <th>
+                        <td>Mã nhân viên</td>
+                        <td>Họ tên</td>
+                        <td>Chi tiết</td>
+                    </th>
+                </thead>
+                <tbody v-if="this.listEmployee.length > 0">
+                    <tr v-for="employee in listEmployee">
+                        <td>{{ employee.employee_number }}</td>
+                        <td>{{ employee.full_name }}</td>
+                        <td><button v-on:click="detail(employee.employee_number)">Chi tiết</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
 </template>
 
 <script>
-/**
- * Vue.js code in here!
- */
 // import Vue from 'vue'
 import axios from 'axios'
-import ChildComponent from './components/ChildComponent.vue'
 // import component1 from 'component1'
 // import component2 from 'component2'
 
@@ -28,14 +35,18 @@ export default {
     /***********************************************************************************************************
      ******************************* Pass data to child component **********************************************
         **********************************************************************************************************/
-    // prop: [variable1, variable2],
+    props: [
+        
+    ],
     // components: {component1, component2},
     data() {
         /***********************************************************************************************************
          ******************************* Initialize global variables ***********************************************
             **********************************************************************************************************/
         return {
-            employeeNumberCurrent: null
+            employeeNumber: "",
+            fullName: "",
+            listEmployee: [],
         }
     },
     created() {
@@ -64,26 +75,33 @@ export default {
         defaultFunction() {
             this.msg = "Replace message here!";
         },
-        funcHandleDataFromChild(data) {
-          // Gan bien o component cha bang du lieu gui len tu component con
-          this.dataFromChild = data;
+        add() {
+            // Kiem tra ma nhan vien
+            for(let i = 0; i < this.listEmployee.length; i++) {
+                if (this.employeeNumber == this.listEmployee[i].employee_number) {
+                    alert("Mã sinh viên không được trùng");
+                    return false;
+                }
+            }
+            // Gui du lieu vao list
+            this.listEmployee.push({
+                "employee_number": this.employeeNumber,
+                "full_name": this.fullName
+            });
+            this.employeeNumber = "";
+            this.fullName = "";
+        },
+        detail(employeeNumber) {
+            // Truyen du lieu len component cha
+            let currentEmployee = null;
+            for (let i = 0; i < this.listEmployee.length; i++) {
+                if (employeeNumber == this.listEmployee[i].employee_number) {
+                    currentEmployee = this.listEmployee[i]
+                }
+            }
+            this.$emit("detail", currentEmployee);
         },
 
-        /**
-         * Example default function using param 
-         *
-         * @param int pageNum number of page
-         * @return boolean
-         */
-        defaultFunctionUsingParam(pageNum) {
-            console.log(pageNum);
-            return false;
-        },
-        handleDetailEmployee(employee) {
-            this.employeeNumberCurrent = employee;
-        },
-
-        
         /***********************************************************************************************************
          ******* Async and await functions for manipulating server-side data through internal API protocols ********
             **********************************************************************************************************/
@@ -110,11 +128,10 @@ export default {
 </script>
 
 <style scoped>
-#main {
-  width: 700px;
-  height: 700px;
-  border: 1px solid gray;
-  margin: 0 auto;
-  display: flex;
+#form-add-new {
+    width: 400px;
+    height: 300px;
+    border: 1px solid black;
+    overflow: auto;
 }
 </style>
