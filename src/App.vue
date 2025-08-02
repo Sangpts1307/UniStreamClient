@@ -12,6 +12,12 @@ import DetailComponent from './components/DetailComponent.vue'
     <FormComponent @detail="handleDetailEmployee"/>
     <DetailComponent v-if="employeeNumberCurrent" :currentEmployee="employeeNumberCurrent"/>
   </div>
+
+  <nav>
+    <RouterLink to="/">Go to Home</RouterLink>
+    <RouterLink to="/about">Go to About</RouterLink>
+  </nav>
+  <RouterView />
 </template>
 
 <script>
@@ -21,6 +27,7 @@ import DetailComponent from './components/DetailComponent.vue'
 // import Vue from 'vue'
 import axios from 'axios'
 import ChildComponent from './components/ChildComponent.vue'
+import { RouterLink } from 'vue-router'
 // import component1 from 'component1'
 // import component2 from 'component2'
 

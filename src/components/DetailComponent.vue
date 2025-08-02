@@ -9,10 +9,21 @@
         </select>
         <br>
         <button v-on:click="addQTY()">Thêm</button>
+        <div id="chart">
+            <Bar
+                id="my-chart-id"
+                :options="chartOptions"
+                :data="chartData"
+            />
+        </div>
     </div>
 </template>
 
 <script>
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 /**
  * Vue.js code in here!
  */
@@ -26,6 +37,7 @@ export default {
      ******************************* Pass data to child component **********************************************
         **********************************************************************************************************/
     props: ["currentEmployee"],
+    components: { Bar },
     // components: {component1, component2},
     data() {
         /***********************************************************************************************************
@@ -34,7 +46,26 @@ export default {
         return {
             qty: 1,
             type: "terebi",
-            listType: ["keitai denwa", "terebi", "kompuuta", "Laptopu"],
+            listType: ["keitai", "terebi", "kompuuta", "pasookon"],
+            // Init variable of add data for type
+            typeData: {
+                "keitai": 0,
+                "terebi": 0,
+                "kompuuta": 0,
+                "pasookon": 0,
+            },
+            chartData: {
+                labels: ["keitai", "terebi", "kompuuta", "pasookon"],
+                datasets: [{ 
+                    data: [0, 0, 0, 0],
+                    backgroundColor: "blue",
+                    label: "Category quantity",
+                }]
+            },
+            chartOptions: {
+                responsive: true
+            },
+            intervalID: null,
         }
     },
     created() {
@@ -42,10 +73,13 @@ export default {
          *********************** Initialize data when this component is used. **************************************
             **********************************************************************************************************/
         console.log('Init created component and call to function get data from api server.');
-        
+        this.callAPI();
     },
     mounted() {
-        
+        // Dem nguoc moi 3s se goi toi API de lay du lieu moi
+        this.intervalID = setInterval(() => {
+            this.callAPI();
+        }, 3000);
         
     },
     watch: {
@@ -67,18 +101,31 @@ export default {
           // Gan bien o component cha bang du lieu gui len tu component con
           this.dataFromChild = data;
         },
-
         /**
-         * Example default function using param 
-         *
-         * @param int pageNum number of page
-         * @return boolean
+         * Function add qty of employee and update chart
          */
-        defaultFunctionUsingParam(pageNum) {
-            console.log(pageNum);
-            return false;
+        addQTY() {
+            console.log(this.type, this.typeData);
+            
+            switch (this.type) {
+                case "keitai":
+                    this.typeData.keitai = this.typeData.keitai + this.qty;
+                    break;
+                case "terebi":
+                    this.typeData.terebi = this.typeData.terebi + this.qty;
+                    break;
+                case "kompuuta":
+                    this.typeData.kompuuta = this.typeData.kompuuta + this.qty;
+                    break;
+                case "pasookon":
+                    this.typeData.pasookon = this.typeData.pasookon + this.qty;
+                    break;
+                default:
+                    console.log("Cannot find type!");
+                    return false;
+            }            
+            
         },
-
         
         /***********************************************************************************************************
          ******* Async and await functions for manipulating server-side data through internal API protocols ********
@@ -89,14 +136,23 @@ export default {
          */
         async callAPI() {
             try {
-                const callAPI = await axios.get('/apiendpoint', {
+                let typeData = [];
+                const callAPI = await axios.get('http://localhost:5173/list-data', {
                     /************ Attach param for request here ***************/
                 }).then(function (response) {
-                    console.log(response);
+                    // Append data to chart
+                    // response ra du lieu ma server tra ve
+                    typeData = response.data;
                 }).catch(function (errors) {
                     console.log(errors);
                 });
-                console.log(callAPI.data);
+                this.chartData = {
+                    ...this.chartData,
+                    datasets: [{
+                        ...this.chartData.datasets[0],
+                        data: typeData
+                    }]
+                };
             } catch (err) {
                 console.log(err);
             }
