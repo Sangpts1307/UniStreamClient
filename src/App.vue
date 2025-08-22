@@ -1,23 +1,12 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import DemoComponent from './components/DemoComponent.vue'
-import ChildComponent from './components/ChildComponent.vue'
-import FormComponent from './components/FormComponent.vue'
-import DetailComponent from './components/DetailComponent.vue'
 </script>
 
 <template>
-  <div id="main">
-    <FormComponent @detail="handleDetailEmployee"/>
-    <DetailComponent v-if="employeeNumberCurrent" :currentEmployee="employeeNumberCurrent"/>
-  </div>
 
-  <nav>
-    <RouterLink to="/">Go to Home</RouterLink>
-    <RouterLink to="/about">Go to About</RouterLink>
-  </nav>
-  <RouterView />
+    <nav>
+       <RouterView />
+    </nav>
+    
 </template>
 
 <script>
@@ -26,8 +15,8 @@ import DetailComponent from './components/DetailComponent.vue'
  */
 // import Vue from 'vue'
 import axios from 'axios'
-import ChildComponent from './components/ChildComponent.vue'
 import { RouterLink } from 'vue-router'
+import LoginComponent from './components/LoginComponent.vue'
 // import component1 from 'component1'
 // import component2 from 'component2'
 
