@@ -119,8 +119,9 @@ export default {
                 if (response.data.code == 200) {
                     // Save to session storage
                     sessionStorage.setItem("access_token", response.data.data.accessToken);
+                    sessionStorage.setItem("user_info", JSON.stringify(response.data.data.user_info));
                     window.location.replace('/index');
-                    return false;
+                    return true;
                 }
                 alert("401 UnAuthentication");
                 return false;
